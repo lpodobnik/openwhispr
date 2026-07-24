@@ -18,6 +18,11 @@ const { getCortiToken } = require("./cortiAuth");
 const { createTinfoilRealtimeSocket } = require("./tinfoilSecureClient");
 const { getTinfoilChatModels } = require("./tinfoilCatalog");
 const { transcribeWithTinfoil } = require("./tinfoilTranscription");
+const {
+  normalizeSelfHostedTranscriptionUrl,
+  transcribeSelfHostedChunk,
+} = require("./selfHostedMeetingChunk");
+const { createFailureTracker } = require("./selfHostedMeetingFailureTracker");
 const AudioStorageManager = require("./audioStorage");
 
 // Tinfoil's only realtime STT model — fallback when the renderer omits one.
@@ -5314,6 +5319,9 @@ class IPCHandlers {
     let meetingLocalProvider = null;
     let meetingLocalModel = null;
     let meetingLocalLanguage = null;
+    let meetingLocalRemoteEndpoint = null;
+    let meetingLocalRemoteModel = null;
+    let meetingLocalRemoteFailures = null;
     let meetingLocalTranscribing = false;
     let meetingPendingMicChunks = [];
     let meetingPendingMicFinals = [];
@@ -5705,6 +5713,30 @@ class IPCHandlers {
           result = await this.parakeetManager.transcribeLocalParakeet(wav, {
             model: meetingLocalModel,
           });
+        } else if (meetingLocalProvider === "self-hosted") {
+          // No API key by convention: shouldSkipTranscriptionApiKey() treats
+          // self-hosted as keyless, since LAN servers usually have no auth.
+          result = await transcribeSelfHostedChunk(wav, {
+            endpoint: meetingLocalRemoteEndpoint,
+            model: meetingLocalRemoteModel,
+            language: meetingLocalLanguage,
+          });
+
+          // A dead server drops chunks but must never end the meeting. Warn once
+          // per outage so the user knows why the transcript went quiet.
+          if (result.success) {
+            meetingLocalRemoteFailures?.recordSuccess();
+          } else if (meetingLocalRemoteFailures?.recordFailure()) {
+            debugLogger.warn("Self-hosted meeting transcription repeatedly failing", {
+              reason: result.reason,
+            });
+            if (meetingLocalWin && !meetingLocalWin.isDestroyed()) {
+              meetingLocalWin.webContents.send(
+                "meeting-transcription-error",
+                i18nMain.t("meetingTranscription.selfHostedServerUnreachable")
+              );
+            }
+          }
         } else {
           const vadOptions = this._resolveWhisperVadOptions("meeting");
           result = await this.whisperManager.transcribeLocalWhisper(wav, {
@@ -5882,6 +5914,9 @@ class IPCHandlers {
       meetingLocalProvider = null;
       meetingLocalModel = null;
       meetingLocalLanguage = null;
+      meetingLocalRemoteEndpoint = null;
+      meetingLocalRemoteModel = null;
+      meetingLocalRemoteFailures = null;
       meetingLocalTranscribing = false;
       meetingPendingMicChunks = [];
       resetPendingMicFinals();
@@ -6263,6 +6298,28 @@ class IPCHandlers {
           meetingLocalProvider = options.localProvider || "whisper";
           meetingLocalModel = options.localModel || null;
           meetingLocalLanguage = options.language || null;
+
+          // Fail closed: a self-hosted meeting whose URL will not resolve must not
+          // start at all. Falling through to a cloud provider here is exactly the
+          // leak this mode exists to prevent.
+          if (meetingLocalProvider === "self-hosted") {
+            const resolvedRemote = normalizeSelfHostedTranscriptionUrl(options.remoteUrl);
+            if (!resolvedRemote.valid) {
+              debugLogger.warn("Refusing to start self-hosted meeting transcription", {
+                reason: resolvedRemote.reason,
+              });
+              resetMeetingLocalState();
+              return {
+                success: false,
+                error: `Self-hosted transcription URL is ${resolvedRemote.reason}`,
+                code: "SELF_HOSTED_URL_INVALID",
+              };
+            }
+            meetingLocalRemoteEndpoint = resolvedRemote.endpoint;
+            meetingLocalRemoteModel = options.remoteModel || null;
+            meetingLocalRemoteFailures = createFailureTracker();
+          }
+
           meetingLocalWin = BrowserWindow.fromWebContents(event.sender);
           meetingLocalBuffers = { mic: [], system: [] };
           meetingLocalTranscript = "";

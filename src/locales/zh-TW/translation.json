@@ -1685,7 +1685,7 @@
         "noteRecording": "筆記錄音",
         "upload": "上傳音訊"
       },
-      "selfHostedStreamingNote": "需要支援串流轉錄的伺服器。"
+      "selfHostedStreamingNote": "需要相容 OpenAI 的 /v1/audio/transcriptions 端點。音訊以 5 秒為一段傳送。"
     },
     "llms": {
       "title": "語言模型",
@@ -3007,6 +3007,9 @@
       "successDescription": "Bienvenido a {{name}}.",
       "errorTitle": "No se pudo aceptar la invitación"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "自架轉錄伺服器無回應。會議仍在錄製中。"
   },
   "meetingNotification": {
     "title": "偵測到會議",

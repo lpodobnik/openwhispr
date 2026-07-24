@@ -1685,7 +1685,7 @@
         "noteRecording": "Notizaufnahme",
         "upload": "Audio-Upload"
       },
-      "selfHostedStreamingNote": "Erfordert einen Server, der Streaming-Transkription unterstützt."
+      "selfHostedStreamingNote": "Erfordert einen OpenAI-kompatiblen /v1/audio/transcriptions-Endpunkt. Audio wird in 5-Sekunden-Abschnitten gesendet."
     },
     "llms": {
       "title": "Sprachmodelle",
@@ -3007,6 +3007,9 @@
       "successDescription": "Willkommen bei {{name}}.",
       "errorTitle": "Einladung konnte nicht angenommen werden"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "Der selbst gehostete Transkriptionsserver antwortet nicht. Das Meeting wird weiterhin aufgezeichnet."
   },
   "meetingNotification": {
     "title": "Meeting erkannt",

@@ -1733,7 +1733,7 @@
         "noteRecording": "Enregistrement de notes",
         "upload": "Importer un audio"
       },
-      "selfHostedStreamingNote": "Nécessite un serveur qui prend en charge la transcription en streaming."
+      "selfHostedStreamingNote": "Nécessite un point de terminaison /v1/audio/transcriptions compatible OpenAI. L'audio est envoyé par blocs de 5 secondes."
     },
     "llms": {
       "title": "Modèles de langage",
@@ -3007,6 +3007,9 @@
       "successDescription": "Bienvenue dans {{name}}.",
       "errorTitle": "Impossible d'accepter l'invitation"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "Le serveur de transcription auto-hébergé ne répond pas. La réunion continue d'être enregistrée."
   },
   "meetingNotification": {
     "title": "Réunion détectée",

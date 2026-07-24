@@ -1858,7 +1858,7 @@
         "noteRecording": "Note Recording",
         "upload": "Audio Upload"
       },
-      "selfHostedStreamingNote": "Requires a server that supports streaming transcription."
+      "selfHostedStreamingNote": "Requires an OpenAI-compatible /v1/audio/transcriptions endpoint. Audio is sent in 5-second chunks."
     },
     "llms": {
       "title": "Language Models",
@@ -3007,6 +3007,9 @@
       "you": "You",
       "others": "Others"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "Self-hosted transcription server is not responding. The meeting is still recording."
   },
   "meetingNotification": {
     "title": "Meeting detected",
