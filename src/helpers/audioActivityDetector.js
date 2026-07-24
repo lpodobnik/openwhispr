@@ -490,7 +490,25 @@ class AudioActivityDetector extends EventEmitter {
     }
   }
 
+  // Primary signal is Windows' own mic-in-use ledger, which catches browser
+  // meetings and any app the exe-name list has never heard of. The legacy
+  // helper-exe scan stays OR-ed in so nothing detected today regresses.
   async _checkWin32() {
+    try {
+      const { getActiveMicSessions } = require("./windowsMicSessionDetector");
+      const { ok, sessions } = await getActiveMicSessions();
+      if (ok && sessions.length > 0) {
+        debugLogger.debug(
+          "Active mic sessions detected",
+          { identities: sessions.map((s) => s.identity) },
+          "meeting"
+        );
+        return true;
+      }
+    } catch (err) {
+      debugLogger.debug("Mic session check failed", { error: err.message }, "meeting");
+    }
+
     try {
       const processListCache = require("./processListCache");
       const names = await processListCache.getProcessList();

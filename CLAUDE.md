@@ -108,11 +108,17 @@ OpenWhispr is an Electron-based desktop dictation application that uses whisper.
 - **meetingProcessDetector.js**: Detects running meeting apps
   - macOS: Event-driven via `systemPreferences.subscribeWorkspaceNotification` (zero CPU)
   - Windows/Linux: Shared `processListCache` polling (30s interval)
+  - Windows also merges in `windowsMicSessionDetector` — helper-exe names alone miss MSIX Teams, which runs as `ms-teams.exe` and does not spawn `ms-teams_modulehost.exe` in-call
 - **audioActivityDetector.js**: Detects microphone usage for unscheduled meetings
   - macOS: Event-driven via `macos-mic-listener` binary (CoreAudio property listeners)
   - Windows: Event-driven via `windows-mic-listener.exe` (WASAPI sessions, self-PID exclusion)
   - Linux: Event-driven via `pactl subscribe` (PulseAudio source-output events)
   - All platforms: Graceful fallback to polling if native approach fails
+- **windowsMicSessionDetector.js**: Reads Windows' mic-in-use ledger (`HKCU\...\CapabilityAccessManager\ConsentStore\microphone`) via `reg query`
+  - An entry with `LastUsedTimeStart` and no non-zero `LastUsedTimeStop` is capturing right now
+  - Backs the Windows polling fallback, so it catches browser meetings (Meet, Teams-in-browser) instead of rescanning exe names
+  - Excludes OpenWhispr's own session (identity derived from `process.execPath`) so dictation never self-triggers
+  - Returns `{ ok, sessions }` — `ok: false` means "registry told us nothing usable", and callers must fall back to the exe-name scan rather than read it as an idle mic
 - **processListCache.js**: Shared singleton process list cache (5s TTL, `ps-list` npm)
 - **googleCalendarManager.js**: Google Calendar sync with exponential backoff
   - 10s socket timeout on API requests
@@ -573,6 +579,7 @@ Detects meetings via three independent sources, orchestrated by `MeetingDetectio
 - Windows: `windows-mic-listener.exe` — WASAPI `IAudioSessionManager2` session monitoring, `--exclude-pid` for self-mic exclusion
 - Linux: `pactl subscribe` — PulseAudio source-output events
 - All platforms: Graceful fallback to polling if native binary/command unavailable
+- Windows polling fallback reads the CapabilityAccessManager mic ledger (`windowsMicSessionDetector`), not process names — it is a real mic check, so browser meetings count. Legacy exe names (`cpthost.exe`, `ms-teams_modulehost.exe`, `webexmeetingsapp.exe`) stay OR-ed in as a secondary signal
 
 **Calendar Reminders** (scheduled meetings):
 
@@ -726,6 +733,7 @@ const { t } = useTranslation();
    - Windows: Verify `windows-mic-listener.exe` exists in `resources/bin/` (downloaded during `prebuild:win`)
    - Linux: Verify `pactl` is installed (`pulseaudio-utils` or `pipewire-pulse` package)
    - If event-driven binary is missing, detection falls back to polling automatically
+   - Windows, in polling mode: during a call, `reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone" /s /v LastUsedTimeStop` should show the meeting app at `0x0`. If nothing reads `0x0` while the mic is live, that app is not tracked by the consent store and only the exe-name fallback can see it
 
 7. **Local Semantic Search Not Working**:
    - Qdrant binary should be in `resources/bin/qdrant-{platform}-{arch}` (auto-downloaded during `predev`/`prebuild`)

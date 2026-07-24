@@ -39,6 +39,8 @@ class MeetingProcessDetector extends EventEmitter {
     this.dismissedProcesses = new Set();
     this._polling = false;
     this._subscriptionIds = [];
+    // Last successful win32 mic-session read, retained across a failed lookup.
+    this._micDerivedKeys = new Set();
   }
 
   start() {
@@ -179,6 +181,7 @@ class MeetingProcessDetector extends EventEmitter {
 
     this.detectedProcesses.clear();
     this.dismissedProcesses.clear();
+    this._micDerivedKeys.clear();
     debugLogger.info("Stopped meeting process detector", {}, "meeting");
   }
 
@@ -204,6 +207,29 @@ class MeetingProcessDetector extends EventEmitter {
     return entry ? entry.appName : processKey;
   }
 
+  // Windows helper-exe names are unreliable — current MSIX Teams does not spawn
+  // ms-teams_modulehost.exe in-call. Ask the OS which apps hold the mic instead.
+  async _activeMicProcessKeys() {
+    try {
+      const {
+        getActiveMicSessions,
+        mapIdentityToProcessKey,
+      } = require("./windowsMicSessionDetector");
+      const { ok, sessions } = await getActiveMicSessions();
+      if (!ok) return { ok: false, entries: [] };
+
+      const entries = [];
+      for (const { identity } of sessions) {
+        const entry = mapIdentityToProcessKey(identity);
+        if (entry) entries.push(entry);
+      }
+      return { ok: true, entries };
+    } catch (err) {
+      debugLogger.debug("Mic session lookup failed", { error: err.message }, "meeting");
+      return { ok: false, entries: [] };
+    }
+  }
+
   async _poll() {
     if (this._polling) return;
     this._polling = true;
@@ -211,9 +237,37 @@ class MeetingProcessDetector extends EventEmitter {
       const apps = MEETING_APPS[process.platform] || MEETING_APPS.linux || [];
       const processList = await processListCache.getProcessList();
 
+      // Merge every source into one running set before deciding, so a key seen by
+      // one signal is not immediately "ended" by the other reporting it absent.
+      const running = new Set();
+      const appNames = new Map();
       for (const { processKey, appName, imageName } of apps) {
-        const isRunning = processList.includes(imageName);
-        this._updateDetection(processKey, appName, isRunning);
+        appNames.set(processKey, appName);
+        if (processList.includes(imageName)) running.add(processKey);
+      }
+
+      if (process.platform === "win32") {
+        const { ok, entries } = await this._activeMicProcessKeys();
+        if (ok) {
+          this._micDerivedKeys = new Set(entries.map((e) => e.processKey));
+        } else {
+          // A failed lookup is not evidence the meeting ended. Carry the last known
+          // mic-derived keys so a transient `reg` error cannot emit a spurious
+          // "ended", which would also clear the user's dismissal.
+          for (const processKey of this._micDerivedKeys) {
+            entries.push({ processKey, appName: this._getAppName(processKey) });
+          }
+        }
+        for (const { processKey, appName } of entries) {
+          running.add(processKey);
+          if (!appNames.has(processKey)) appNames.set(processKey, appName);
+        }
+      }
+
+      // Include already-detected keys so they can still transition to ended.
+      for (const processKey of new Set([...appNames.keys(), ...this.detectedProcesses.keys()])) {
+        const appName = appNames.get(processKey) || this._getAppName(processKey);
+        this._updateDetection(processKey, appName, running.has(processKey));
       }
     } catch (err) {
       debugLogger.warn("Poll error", { error: err.message }, "meeting");
