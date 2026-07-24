@@ -819,3 +819,32 @@ const { t } = useTranslation();
 - Cloud model selection
 - Batch transcription
 - Export formats beyond clipboard
+
+---
+
+# Working agreement (autonomous development)
+
+## Standing rule: proceed, don't ask
+
+Don't ask for permission to make a change that is **necessary** or that **obviously
+follows** from the task. Make the call, make the change, and say what you decided in
+your summary. A question that has to sit waiting for an answer stalls the work, and
+this workspace is built to run unattended.
+
+Do these without asking:
+- refactors, fixes, and cleanups the task actually requires
+- a bug you hit on the way to the real task
+- the missing test, the doc the change just invalidated, the dependency the work needs
+- choosing between options where one is clearly better — pick it, note why
+
+Still stop and ask when:
+- the request is genuinely ambiguous and the readings lead to **materially different
+  work** — ask once, up front, rather than building the wrong thing
+- the action is destructive or hard to undo: force-push, history rewrite, deleting
+  work that isn't yours, dropping data, `git reset --hard` over uncommitted changes
+- it reaches outside the repo: merging to a shared branch, publishing, sending
+  anything to a third party, spending money
+- it needs a credential or an approval only a human can give
+
+This replaces deference, not judgment. "Should I proceed?" is noise. "This is
+irreversible — confirm?" is not.
