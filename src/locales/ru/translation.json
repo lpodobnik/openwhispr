@@ -1685,7 +1685,7 @@
         "noteRecording": "Запись заметок",
         "upload": "Загрузка аудио"
       },
-      "selfHostedStreamingNote": "Требуется сервер с поддержкой потоковой транскрипции."
+      "selfHostedStreamingNote": "Требуется совместимая с OpenAI конечная точка /v1/audio/transcriptions. Аудио отправляется фрагментами по 5 секунд."
     },
     "llms": {
       "title": "Языковые модели",
@@ -3011,6 +3011,9 @@
       "successDescription": "Willkommen bei {{name}}.",
       "errorTitle": "Einladung konnte nicht angenommen werden"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "Сервер транскрипции, размещённый самостоятельно, не отвечает. Запись встречи продолжается."
   },
   "meetingNotification": {
     "title": "Обнаружена встреча",

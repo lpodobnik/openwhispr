@@ -130,6 +130,30 @@ const getMeetingTranscriptionOptions = () => {
     };
   }
 
+  // Self-hosted was settings-only until now: MeetingSettings persisted these keys
+  // but nothing consumed them, so choosing self-hosted fell through to the cloud
+  // branch below and streamed meeting audio to OpenAI (#581, #1280). Route it
+  // through the local path instead — that path is already 5s batch chunking, so
+  // a self-hosted server only needs a batch /v1/audio/transcriptions endpoint.
+  if (resolved.transcriptionMode === "self-hosted") {
+    const remoteUrl = (resolved.remoteTranscriptionUrl || "").trim();
+    // Fail closed. Falling through to cloud realtime here would silently
+    // reintroduce the exact leak this branch exists to close.
+    if (!remoteUrl) {
+      throw new Error(
+        "Self-hosted meeting transcription is selected but no server URL is configured."
+      );
+    }
+    return {
+      provider: "local" as const,
+      localProvider: "self-hosted" as const,
+      localModel: resolved.remoteTranscriptionModel,
+      remoteUrl,
+      remoteModel: resolved.remoteTranscriptionModel,
+      language,
+    };
+  }
+
   // Corti (BYOK) streams over its own WSS — independent of the server-driven catalog.
   const selectedProvider =
     state.meetingCloudTranscriptionProvider || state.cloudTranscriptionProvider;

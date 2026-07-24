@@ -1685,7 +1685,7 @@
         "noteRecording": "ノート録音",
         "upload": "音声のアップロード"
       },
-      "selfHostedStreamingNote": "ストリーミング文字起こしに対応したサーバーが必要です。"
+      "selfHostedStreamingNote": "OpenAI 互換の /v1/audio/transcriptions エンドポイントが必要です。音声は 5 秒ごとに分割して送信されます。"
     },
     "llms": {
       "title": "言語モデル",
@@ -3007,6 +3007,9 @@
       "successDescription": "Bienvenido a {{name}}.",
       "errorTitle": "No se pudo aceptar la invitación"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "セルフホストの文字起こしサーバーが応答していません。会議の録音は継続中です。"
   },
   "meetingNotification": {
     "title": "会議を検出しました",

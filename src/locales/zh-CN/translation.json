@@ -1685,7 +1685,7 @@
         "noteRecording": "笔记录音",
         "upload": "上传音频"
       },
-      "selfHostedStreamingNote": "需要支持流式转录的服务器。"
+      "selfHostedStreamingNote": "需要兼容 OpenAI 的 /v1/audio/transcriptions 端点。音频以 5 秒为一段发送。"
     },
     "llms": {
       "title": "语言模型",
@@ -3007,6 +3007,9 @@
       "successDescription": "Bienvenido a {{name}}.",
       "errorTitle": "No se pudo aceptar la invitación"
     }
+  },
+  "meetingTranscription": {
+    "selfHostedServerUnreachable": "自托管转录服务器无响应。会议仍在录制中。"
   },
   "meetingNotification": {
     "title": "检测到会议",

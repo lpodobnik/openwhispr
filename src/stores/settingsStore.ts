@@ -1930,6 +1930,8 @@ export interface ResolvedMeetingTranscription {
   transcriptionMode: InferenceMode;
   remoteTranscriptionType: SelfHostedType;
   remoteTranscriptionUrl: string;
+  // No meeting-scoped model key exists, so meetings inherit the dictation model.
+  remoteTranscriptionModel: string;
 }
 
 export const selectResolvedMeetingTranscription = (
@@ -1953,6 +1955,7 @@ export const selectResolvedMeetingTranscription = (
     transcriptionMode: state.meetingTranscriptionMode,
     remoteTranscriptionType: state.meetingRemoteTranscriptionType,
     remoteTranscriptionUrl: state.meetingRemoteTranscriptionUrl || state.remoteTranscriptionUrl,
+    remoteTranscriptionModel: state.remoteTranscriptionModel || "",
   };
 };
 
