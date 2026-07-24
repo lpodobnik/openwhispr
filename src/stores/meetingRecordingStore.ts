@@ -157,13 +157,13 @@ const getMeetingTranscriptionOptions = () => {
       {},
       "meeting"
     );
-    return { provider: "openai-realtime" as const, model: "gpt-4o-mini-transcribe", mode };
+    return { provider: "openai-realtime" as const, model: "gpt-4o-mini-transcribe", mode, language };
   }
   const model =
     provider.models.find((m) => m.id === resolved.cloudTranscriptionModel)?.id ??
     provider.models.find((m) => m.default)?.id ??
     provider.models[0]?.id;
-  return { provider: `${provider.id}-realtime` as const, model, mode };
+  return { provider: `${provider.id}-realtime` as const, model, mode, language };
 };
 
 const stopMediaStream = (stream: MediaStream | null) => {
