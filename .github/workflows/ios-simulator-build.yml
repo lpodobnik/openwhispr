@@ -53,12 +53,20 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           node_modules/.bin/patch-package --error-on-fail
 
+      # The Podfile uses the cocoapods-spm plugin (FluidAudio is a Swift Package),
+      # pinned in the Gemfile.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: openwhispr-mobile
+
       - name: Generate native iOS project
         run: node_modules/.bin/expo prebuild --platform ios --no-install --clean
 
       - name: Install CocoaPods
         working-directory: openwhispr-mobile/ios
-        run: pod install
+        run: bundle exec pod install
 
       - name: Build unsigned Simulator app
         working-directory: openwhispr-mobile/ios
