@@ -58,8 +58,12 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
-          bundler-cache: true
-          working-directory: openwhispr-mobile
+
+      # The lockfile pins one macOS platform; add the runner's instead of failing.
+      - name: Install CocoaPods gems
+        run: |
+          bundle lock --add-platform "$(ruby -e 'print Gem::Platform.local')"
+          bundle install --jobs 4
 
       - name: Generate native iOS project
         run: node_modules/.bin/expo prebuild --platform ios --no-install --clean
