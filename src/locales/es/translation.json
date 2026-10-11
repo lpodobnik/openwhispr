@@ -2394,7 +2394,8 @@
         }
       },
       "meetingEnterpriseOnly": "Tu organización solo permite la transcripción en nube empresarial, que aún no cubre la grabación de reuniones.",
-      "meetingCloudSignedOut": "Las grabaciones de notas no pueden iniciarse con OpenWhispr Cloud sin haber iniciado sesión. Elige otro motor arriba."
+      "meetingCloudSignedOut": "Las grabaciones de notas no pueden iniciarse con OpenWhispr Cloud sin haber iniciado sesión. Elige otro motor arriba.",
+      "selfHostedStreamingNote": "Requiere un endpoint /v1/audio/transcriptions compatible con OpenAI. El audio se envía en fragmentos de 5 segundos."
     },
     "intelligence": {
       "gpuDevice": {
@@ -3197,7 +3198,9 @@
       "description": "Transcripciones y resúmenes estructurados",
       "back": "Atrás",
       "restrictedByOrg": "La transcripción de reuniones está restringida por tu organización.",
-      "unsupportedSelfHosted": "La grabación de notas aún no puede usar un servidor propio. Abre Ajustes y elige Local o un proveedor de streaming.",
+      "selfHostedUrlMissing": "La grabación de notas usa un servidor propio, pero no hay URL configurada. Abre Ajustes e introduce la URL de tu servidor.",
+      "selfHostedUrlInvalid": "La URL del servidor de transcripción propio no es válida. Usa https://, o http:// solo para una dirección de red local.",
+      "selfHostedUnreachable": "El servidor de transcripción propio no responde. La reunión se sigue grabando.",
       "unsupportedProvider": "La grabación de notas no puede usar {{provider}} para transcripción en vivo. Abre Ajustes y elige Local o un proveedor de streaming.",
       "noProviderSelected": "No hay ningún proveedor seleccionado para la grabación de notas. Abre Ajustes y elige Local o un proveedor de streaming.",
       "signInRequired": "La grabación de notas requiere iniciar sesión. Por favor, inicia sesión.",

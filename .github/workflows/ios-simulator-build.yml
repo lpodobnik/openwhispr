@@ -1,0 +1,97 @@
+name: iOS Simulator Build
+
+# Builds the Expo app in openwhispr-mobile/ for the iOS Simulator, unsigned, so a
+# fork without the Gizmo Labs Apple team or Expo account can still produce and
+# check a build. Installing on a real iPhone needs signing: run `eas build` with
+# your own Apple team and bundle identifiers instead.
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths:
+      - "openwhispr-mobile/**"
+      - ".github/workflows/ios-simulator-build.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  EXPO_NO_DOTENV: "1"
+  SENTRY_DISABLE_AUTO_UPLOAD: "true"
+  OPENWHISPR_APP_ENV: production
+
+jobs:
+  build:
+    name: Build for iOS Simulator
+    runs-on: macos-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: openwhispr-mobile
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: openwhispr-mobile/.nvmrc
+          cache: npm
+          cache-dependency-path: openwhispr-mobile/package-lock.json
+
+      # Same install as Mobile CI: lifecycle scripts off, reviewed patches applied.
+      # The licensed brand fonts live in a private repo; the app falls back to
+      # Space Grotesk without them.
+      - name: Install locked dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          node_modules/.bin/patch-package --error-on-fail
+
+      - name: Generate native iOS project
+        run: node_modules/.bin/expo prebuild --platform ios --no-install --clean
+
+      - name: Install CocoaPods
+        working-directory: openwhispr-mobile/ios
+        run: pod install
+
+      - name: Build unsigned Simulator app
+        working-directory: openwhispr-mobile/ios
+        run: |
+          set -o pipefail
+          WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
+          SCHEME="${WORKSPACE%.xcworkspace}"
+          echo "Building $WORKSPACE / $SCHEME"
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build | tee "$RUNNER_TEMP/xcodebuild.log" | grep -E "error:|warning: unable|BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/xcodebuild.log"
+
+      - name: Package app
+        working-directory: openwhispr-mobile/ios
+        run: |
+          APP=$(ls -d build/Build/Products/Release-iphonesimulator/*.app | head -n 1)
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "$RUNNER_TEMP/OpenWhispr-iOS-Simulator.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenWhispr-iOS-Simulator
+          path: ${{ runner.temp }}/OpenWhispr-iOS-Simulator.zip
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: xcodebuild-log
+          path: ${{ runner.temp }}/xcodebuild.log

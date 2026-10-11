@@ -2342,7 +2342,8 @@
         }
       },
       "meetingEnterpriseOnly": "贵组织仅允许企业云转录，暂不支持会议录音。",
-      "meetingCloudSignedOut": "未登录时，无法使用 OpenWhispr Cloud 开始笔记录音。请在上方选择其他引擎。"
+      "meetingCloudSignedOut": "未登录时，无法使用 OpenWhispr Cloud 开始笔记录音。请在上方选择其他引擎。",
+      "selfHostedStreamingNote": "需要兼容 OpenAI 的 /v1/audio/transcriptions 端点。音频以 5 秒为一段发送。"
     },
     "intelligence": {
       "gpuDevice": {
@@ -3145,7 +3146,9 @@
       "description": "转录与结构化摘要",
       "back": "返回",
       "restrictedByOrg": "会议转录已被您的组织限制。",
-      "unsupportedSelfHosted": "笔记录音暂不支持自托管端点。请打开设置，选择本地或支持流式传输的服务商。",
+      "selfHostedUrlMissing": "笔记录音已选择自托管服务器，但尚未设置服务器 URL。请打开设置并输入服务器 URL。",
+      "selfHostedUrlInvalid": "自托管转录服务器 URL 无效。请使用 https://，仅本地网络地址可使用 http://。",
+      "selfHostedUnreachable": "自托管转录服务器无响应。会议仍在录制中。",
       "unsupportedProvider": "笔记录音无法使用 {{provider}} 进行实时转录。请打开设置，选择本地或支持流式传输的服务商。",
       "noProviderSelected": "尚未为笔记录音选择服务商。请打开设置，选择本地或支持流式传输的服务商。",
       "signInRequired": "笔记录音需要登录，请先登录。",

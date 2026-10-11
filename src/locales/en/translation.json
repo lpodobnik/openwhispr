@@ -2636,7 +2636,8 @@
         }
       },
       "meetingEnterpriseOnly": "Your organization only allows enterprise cloud transcription, which does not cover meeting recording yet.",
-      "meetingCloudSignedOut": "Note recordings can't start on OpenWhispr Cloud while you're signed out. Choose another engine above."
+      "meetingCloudSignedOut": "Note recordings can't start on OpenWhispr Cloud while you're signed out. Choose another engine above.",
+      "selfHostedStreamingNote": "Requires an OpenAI-compatible /v1/audio/transcriptions endpoint. Audio is sent in 5-second chunks."
     },
     "intelligence": {
       "gpuDevice": {
@@ -3496,7 +3497,9 @@
       "description": "Transcriptions & structured summaries",
       "back": "Back",
       "restrictedByOrg": "Meeting transcription is restricted by your organization.",
-      "unsupportedSelfHosted": "Note Recording can't use a self-hosted endpoint yet. Open Settings and choose Local or a streaming provider.",
+      "selfHostedUrlMissing": "Self-hosted is selected for Note Recording but no server URL is set. Open Settings and enter your server URL.",
+      "selfHostedUrlInvalid": "The self-hosted transcription server URL is invalid. Use https://, or http:// only for a local network address.",
+      "selfHostedUnreachable": "The self-hosted transcription server isn't responding. The meeting is still recording.",
       "unsupportedProvider": "Note Recording can't use {{provider}} for live transcription. Open Settings and choose Local or a streaming provider.",
       "noProviderSelected": "No provider is selected for Note Recording. Open Settings and choose Local or a streaming provider.",
       "signInRequired": "Note Recording requires you to be signed in. Please sign in.",

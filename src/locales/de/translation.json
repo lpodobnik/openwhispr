@@ -2636,7 +2636,8 @@
         }
       },
       "meetingEnterpriseOnly": "Ihre Organisation erlaubt nur Unternehmens-Cloud-Transkription, die Besprechungsaufnahmen noch nicht abdeckt.",
-      "meetingCloudSignedOut": "Notizaufnahmen mit OpenWhispr Cloud können nicht starten, solange Sie abgemeldet sind. Wählen Sie oben eine andere Engine."
+      "meetingCloudSignedOut": "Notizaufnahmen mit OpenWhispr Cloud können nicht starten, solange Sie abgemeldet sind. Wählen Sie oben eine andere Engine.",
+      "selfHostedStreamingNote": "Erfordert einen OpenAI-kompatiblen /v1/audio/transcriptions-Endpunkt. Audio wird in 5-Sekunden-Abschnitten gesendet."
     },
     "intelligence": {
       "gpuDevice": {
@@ -3496,7 +3497,9 @@
       "description": "Transkriptionen und strukturierte Zusammenfassungen",
       "back": "Zurück",
       "restrictedByOrg": "Die Transkription von Besprechungen ist durch Ihre Organisation eingeschränkt.",
-      "unsupportedSelfHosted": "Die Notizaufnahme kann noch keinen selbst gehosteten Endpunkt verwenden. Öffne die Einstellungen und wähle Lokal oder einen Streaming-Anbieter.",
+      "selfHostedUrlMissing": "Für die Notizaufnahme ist ein selbst gehosteter Server ausgewählt, aber keine Server-URL festgelegt. Öffne die Einstellungen und gib die URL deines Servers ein.",
+      "selfHostedUrlInvalid": "Die URL des selbst gehosteten Transkriptionsservers ist ungültig. Verwende https:// oder http:// nur für eine Adresse im lokalen Netzwerk.",
+      "selfHostedUnreachable": "Der selbst gehostete Transkriptionsserver antwortet nicht. Das Meeting wird weiterhin aufgenommen.",
       "unsupportedProvider": "Die Notizaufnahme kann {{provider}} nicht für die Live-Transkription verwenden. Öffne die Einstellungen und wähle Lokal oder einen Streaming-Anbieter.",
       "noProviderSelected": "Für die Notizaufnahme ist kein Anbieter ausgewählt. Öffne die Einstellungen und wähle Lokal oder einen Streaming-Anbieter.",
       "signInRequired": "Für die Notizaufnahme musst du angemeldet sein. Bitte melde dich an.",

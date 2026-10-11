@@ -2342,7 +2342,8 @@
         }
       },
       "meetingEnterpriseOnly": "組織はエンタープライズクラウドの文字起こしのみを許可しており、会議の録音にはまだ対応していません。",
-      "meetingCloudSignedOut": "サインアウト中は OpenWhispr Cloud でノート録音を開始できません。上で別のエンジンを選択してください。"
+      "meetingCloudSignedOut": "サインアウト中は OpenWhispr Cloud でノート録音を開始できません。上で別のエンジンを選択してください。",
+      "selfHostedStreamingNote": "OpenAI 互換の /v1/audio/transcriptions エンドポイントが必要です。音声は 5 秒ごとに送信されます。"
     },
     "intelligence": {
       "gpuDevice": {
@@ -3218,7 +3219,9 @@
       "description": "文字起こしと構造化されたサマリー",
       "back": "戻る",
       "restrictedByOrg": "会議の文字起こしは組織によって制限されています。",
-      "unsupportedSelfHosted": "ノート録音はまだセルフホストのエンドポイントを利用できません。設定を開き、ローカルまたはストリーミング対応プロバイダーを選択してください。",
+      "selfHostedUrlMissing": "ノート録音でセルフホストが選択されていますが、サーバー URL が設定されていません。設定を開いてサーバー URL を入力してください。",
+      "selfHostedUrlInvalid": "セルフホスト文字起こしサーバーの URL が無効です。https:// を使用してください（http:// はローカルネットワークのアドレスのみ）。",
+      "selfHostedUnreachable": "セルフホスト文字起こしサーバーが応答しません。会議の録音は継続しています。",
       "unsupportedProvider": "ノート録音ではライブ文字起こしに {{provider}} を利用できません。設定を開き、ローカルまたはストリーミング対応プロバイダーを選択してください。",
       "noProviderSelected": "ノート録音のプロバイダーが選択されていません。設定を開き、ローカルまたはストリーミング対応プロバイダーを選択してください。",
       "signInRequired": "ノート録音にはサインインが必要です。サインインしてください。",

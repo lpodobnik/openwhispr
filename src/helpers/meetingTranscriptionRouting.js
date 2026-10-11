@@ -34,6 +34,8 @@ export function resolveMeetingTranscriptionOptions({
   whisperModel,
   parakeetModel,
   cohereModel,
+  remoteUrl,
+  remoteModel,
   selectedProvider,
   selectedModel,
   byokProviders,
@@ -66,12 +68,28 @@ export function resolveMeetingTranscriptionOptions({
     };
   }
 
-  // These two are reachable from a settings copy the user never made by hand —
-  // the 1.6.10 follow-flag migration carried a dictation choice Note Recording
-  // cannot serve — so they are sentinels that MeetingRecordingMount translates,
-  // not English sentences. Anything after the colon is an argument.
+  // Self-hosted rides the local path, which is already batch chunking, so the
+  // server only needs an OpenAI-compatible /v1/audio/transcriptions endpoint.
+  // Main resolves and validates the URL with the dictation route resolver and
+  // refuses to start on a bad one. A missing URL fails closed here: falling
+  // through to a cloud provider would send the meeting somewhere the user did
+  // not choose.
+  //
+  // The errors below are sentinels that MeetingRecordingMount translates, not
+  // English sentences. Anything after the colon is an argument.
   if (transcriptionMode === "self-hosted") {
-    throw new Error("unsupportedSelfHosted");
+    const url = typeof remoteUrl === "string" ? remoteUrl.trim() : "";
+    if (!url) {
+      throw new Error("selfHostedUrlMissing");
+    }
+    const model = typeof remoteModel === "string" ? remoteModel.trim() : "";
+    return {
+      provider: "local",
+      localProvider: "self-hosted",
+      localModel: model || null,
+      remoteUrl: url,
+      language,
+    };
   }
 
   if (transcriptionMode !== "providers") {

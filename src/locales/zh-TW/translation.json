@@ -2342,7 +2342,8 @@
         }
       },
       "meetingEnterpriseOnly": "貴組織僅允許企業雲端轉錄，尚不支援會議錄音。",
-      "meetingCloudSignedOut": "未登入時，無法使用 OpenWhispr Cloud 開始筆記錄音。請在上方選擇其他引擎。"
+      "meetingCloudSignedOut": "未登入時，無法使用 OpenWhispr Cloud 開始筆記錄音。請在上方選擇其他引擎。",
+      "selfHostedStreamingNote": "需要相容 OpenAI 的 /v1/audio/transcriptions 端點。音訊以 5 秒為一段傳送。"
     },
     "intelligence": {
       "gpuDevice": {
@@ -3145,7 +3146,9 @@
       "description": "轉錄與結構化摘要",
       "back": "返回",
       "restrictedByOrg": "會議轉錄已被您的組織限制。",
-      "unsupportedSelfHosted": "筆記錄音尚不支援自架端點。請開啟設定，選擇本機或支援串流的服務商。",
+      "selfHostedUrlMissing": "筆記錄音已選擇自架伺服器，但尚未設定伺服器 URL。請開啟設定並輸入伺服器 URL。",
+      "selfHostedUrlInvalid": "自架轉錄伺服器 URL 無效。請使用 https://，僅本地網路位址可使用 http://。",
+      "selfHostedUnreachable": "自架轉錄伺服器沒有回應。會議仍在錄製中。",
       "unsupportedProvider": "筆記錄音無法使用 {{provider}} 進行即時轉錄。請開啟設定，選擇本機或支援串流的服務商。",
       "noProviderSelected": "尚未為筆記錄音選擇服務商。請開啟設定，選擇本機或支援串流的服務商。",
       "signInRequired": "筆記錄音需要登入，請先登入。",

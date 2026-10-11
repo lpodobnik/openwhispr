@@ -10,7 +10,7 @@ const modelRegistryData = require("../../src/models/modelRegistryData.json");
 // MeetingRecordingMount looks up. A healed legacy profile can reach any of them,
 // so an untranslated one would show a bare sentinel in the failure toast.
 const SENTINEL_KEYS = {
-  unsupportedSelfHosted: "unsupportedSelfHosted",
+  selfHostedUrlMissing: "selfHostedUrlMissing",
   unsupportedProvider: "unsupportedProvider",
   noProviderSelected: "noProviderSelected",
 };
@@ -92,17 +92,40 @@ test("BYOK OpenAI never downgrades to managed cloud when its key is unavailable"
   );
 });
 
-test("self-hosted mode never follows a stale Tinfoil provider", async () => {
+test("self-hosted mode routes through the local chunked path to the configured server", async () => {
   const { resolveMeetingTranscriptionOptions } = await load();
 
-  assert.throws(
-    () =>
-      resolveMeetingTranscriptionOptions({
-        ...baseOptions,
-        transcriptionMode: "self-hosted",
-      }),
-    { message: "unsupportedSelfHosted" }
+  assert.deepEqual(
+    resolveMeetingTranscriptionOptions({
+      ...baseOptions,
+      transcriptionMode: "self-hosted",
+      remoteUrl: "  http://192.168.1.20:8178  ",
+      remoteModel: " whisper-large-v3-turbo ",
+    }),
+    {
+      provider: "local",
+      localProvider: "self-hosted",
+      localModel: "whisper-large-v3-turbo",
+      remoteUrl: "http://192.168.1.20:8178",
+      language: "en",
+    }
   );
+});
+
+test("self-hosted mode without a URL fails closed instead of following a stale cloud provider", async () => {
+  const { resolveMeetingTranscriptionOptions } = await load();
+
+  for (const remoteUrl of [undefined, "", "   "]) {
+    assert.throws(
+      () =>
+        resolveMeetingTranscriptionOptions({
+          ...baseOptions,
+          transcriptionMode: "self-hosted",
+          remoteUrl,
+        }),
+      { message: "selfHostedUrlMissing" }
+    );
+  }
 });
 
 test("local mode wins over stale cloud provider state", async () => {

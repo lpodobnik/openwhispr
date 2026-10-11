@@ -106,6 +106,7 @@ const { getRelaunchOptions, getRelaunchWaiter } = require("./autoStartPolicy");
 const HyprlandShortcutManager = require("./hyprlandShortcut");
 const AssemblyAiStreaming = require("./assemblyAiStreaming");
 const { i18nMain, changeLanguage } = require("./i18nMain");
+const { transcribeSelfHostedChunk, createFailureTracker } = require("./selfHostedMeetingChunk");
 const DeepgramStreaming = require("./deepgramStreaming");
 const { GeminiLiveStreaming, GEMINI_LIVE_MODEL } = require("./geminiLiveStreaming");
 const CortiStreaming = require("./cortiStreaming");
@@ -7889,6 +7890,8 @@ class IPCHandlers {
     let meetingLocalProvider = null;
     let meetingLocalModel = null;
     let meetingLocalLanguage = null;
+    let meetingLocalRemoteEndpoint = null;
+    let meetingLocalRemoteFailures = null;
     let meetingLocalTranscribing = false;
     let meetingPendingMicChunks = [];
     let meetingPendingMicFinals = [];
@@ -8287,7 +8290,29 @@ class IPCHandlers {
 
       try {
         let result;
-        if (isSherpaLocalProvider(meetingLocalProvider)) {
+        if (meetingLocalProvider === "self-hosted") {
+          result = await transcribeSelfHostedChunk(wav, {
+            endpoint: meetingLocalRemoteEndpoint,
+            model: meetingLocalModel,
+            language: meetingLocalLanguage,
+            fetchImpl: proxyFetch,
+          });
+          // A dead server drops chunks but never ends the meeting. Warn once per
+          // outage so the user knows why the transcript went quiet.
+          if (result.success) {
+            meetingLocalRemoteFailures?.recordSuccess();
+          } else if (meetingLocalRemoteFailures?.recordFailure()) {
+            debugLogger.warn("Self-hosted meeting transcription repeatedly failing", {
+              reason: result.reason,
+            });
+            if (meetingLocalWin && !meetingLocalWin.isDestroyed()) {
+              meetingLocalWin.webContents.send(
+                "meeting-transcription-error",
+                i18nMain.t("notes.meeting.selfHostedUnreachable")
+              );
+            }
+          }
+        } else if (isSherpaLocalProvider(meetingLocalProvider)) {
           result = await this.parakeetManager.transcribeLocalParakeet(wav, {
             model: meetingLocalModel,
             language: meetingLocalLanguage,
@@ -8490,6 +8515,8 @@ class IPCHandlers {
       meetingLocalProvider = null;
       meetingLocalModel = null;
       meetingLocalLanguage = null;
+      meetingLocalRemoteEndpoint = null;
+      meetingLocalRemoteFailures = null;
       meetingLocalTranscribing = false;
       meetingPendingMicChunks = [];
       resetPendingMicFinals();
@@ -9069,6 +9096,30 @@ class IPCHandlers {
           meetingLocalProvider = options.localProvider || "whisper";
           meetingLocalModel = options.localModel || null;
           meetingLocalLanguage = options.language || null;
+
+          // Fail closed: a self-hosted meeting whose server URL does not resolve
+          // to a secure endpoint must not start, and must never fall through to a
+          // cloud provider. Same resolver and rules as dictation's self-hosted mode.
+          if (meetingLocalProvider === "self-hosted") {
+            const { resolveTranscriptionRoute } = await import("./transcriptionRoute.ts");
+            const route = resolveTranscriptionRoute({
+              settings: {
+                transcriptionMode: "self-hosted",
+                remoteTranscriptionUrl: options.remoteUrl || "",
+                remoteTranscriptionModel: options.localModel || "",
+              },
+            });
+            if (route.transport !== "http-batch" || route.provider !== "self-hosted") {
+              debugLogger.warn("Refusing to start self-hosted meeting transcription", {
+                reason: route.transport === "error" ? route.message : route.transport,
+              });
+              // The catch below rolls back the partial start.
+              throw new Error(i18nMain.t("notes.meeting.selfHostedUrlInvalid"));
+            }
+            meetingLocalRemoteEndpoint = route.endpoint;
+            meetingLocalRemoteFailures = createFailureTracker();
+          }
+
           meetingLocalWin = BrowserWindow.fromWebContents(event.sender);
           meetingLocalBuffers = { mic: [], system: [] };
           meetingLocalTranscript = "";
