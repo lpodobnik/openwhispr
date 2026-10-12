@@ -3167,6 +3167,10 @@ declare global {
         sessionId: string,
         available: boolean
       ) => Promise<{ success: boolean; reason?: "stale-session" }>;
+      /** Base language code (e.g. "hr"), or undefined for auto-detect. */
+      meetingTranscriptionSetLanguage?: (
+        language: string | undefined
+      ) => Promise<{ success: boolean; error?: string }>;
       meetingTranscriptionStop?: (expectedSessionId?: string) => Promise<{
         success: boolean;
         transcript?: string;

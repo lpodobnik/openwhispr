@@ -3149,6 +3149,8 @@
       "selfHostedUrlMissing": "笔记录音已选择自托管服务器，但尚未设置服务器 URL。请打开设置并输入服务器 URL。",
       "selfHostedUrlInvalid": "自托管转录服务器 URL 无效。请使用 https://，仅本地网络地址可使用 http://。",
       "selfHostedUnreachable": "自托管转录服务器无响应。会议仍在录制中。",
+      "languageSwitch": "说话语言",
+      "languageSwitchFailed": "无法切换会议语言。仍在使用之前的语言转录。",
       "unsupportedProvider": "笔记录音无法使用 {{provider}} 进行实时转录。请打开设置，选择本地或支持流式传输的服务商。",
       "noProviderSelected": "尚未为笔记录音选择服务商。请打开设置，选择本地或支持流式传输的服务商。",
       "signInRequired": "笔记录音需要登录，请先登录。",

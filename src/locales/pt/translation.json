@@ -3149,6 +3149,8 @@
       "selfHostedUrlMissing": "A gravação de notas usa um servidor auto-hospedado, mas nenhuma URL foi definida. Abra as Configurações e informe a URL do seu servidor.",
       "selfHostedUrlInvalid": "A URL do servidor de transcrição auto-hospedado é inválida. Use https://, ou http:// apenas para um endereço de rede local.",
       "selfHostedUnreachable": "O servidor de transcrição auto-hospedado não está respondendo. A reunião continua sendo gravada.",
+      "languageSwitch": "Idioma falado",
+      "languageSwitchFailed": "Não foi possível mudar o idioma da reunião. A transcrição continua no anterior.",
       "unsupportedProvider": "A gravação de notas não pode usar {{provider}} para transcrição ao vivo. Abra as Configurações e escolha Local ou um provedor de streaming.",
       "noProviderSelected": "Nenhum provedor está selecionado para a gravação de notas. Abra as Configurações e escolha Local ou um provedor de streaming.",
       "signInRequired": "A gravação de notas exige que você entre na sua conta. Entre para continuar.",

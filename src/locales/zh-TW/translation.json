@@ -3149,6 +3149,8 @@
       "selfHostedUrlMissing": "筆記錄音已選擇自架伺服器，但尚未設定伺服器 URL。請開啟設定並輸入伺服器 URL。",
       "selfHostedUrlInvalid": "自架轉錄伺服器 URL 無效。請使用 https://，僅本地網路位址可使用 http://。",
       "selfHostedUnreachable": "自架轉錄伺服器沒有回應。會議仍在錄製中。",
+      "languageSwitch": "說話語言",
+      "languageSwitchFailed": "無法切換會議語言。仍在使用先前的語言轉錄。",
       "unsupportedProvider": "筆記錄音無法使用 {{provider}} 進行即時轉錄。請開啟設定，選擇本機或支援串流的服務商。",
       "noProviderSelected": "尚未為筆記錄音選擇服務商。請開啟設定，選擇本機或支援串流的服務商。",
       "signInRequired": "筆記錄音需要登入，請先登入。",

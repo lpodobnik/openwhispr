@@ -3500,6 +3500,8 @@
       "selfHostedUrlMissing": "Für die Notizaufnahme ist ein selbst gehosteter Server ausgewählt, aber keine Server-URL festgelegt. Öffne die Einstellungen und gib die URL deines Servers ein.",
       "selfHostedUrlInvalid": "Die URL des selbst gehosteten Transkriptionsservers ist ungültig. Verwende https:// oder http:// nur für eine Adresse im lokalen Netzwerk.",
       "selfHostedUnreachable": "Der selbst gehostete Transkriptionsserver antwortet nicht. Das Meeting wird weiterhin aufgenommen.",
+      "languageSwitch": "Gesprochene Sprache",
+      "languageSwitchFailed": "Die Meeting-Sprache konnte nicht gewechselt werden. Es wird weiter in der vorherigen transkribiert.",
       "unsupportedProvider": "Die Notizaufnahme kann {{provider}} nicht für die Live-Transkription verwenden. Öffne die Einstellungen und wähle Lokal oder einen Streaming-Anbieter.",
       "noProviderSelected": "Für die Notizaufnahme ist kein Anbieter ausgewählt. Öffne die Einstellungen und wähle Lokal oder einen Streaming-Anbieter.",
       "signInRequired": "Für die Notizaufnahme musst du angemeldet sein. Bitte melde dich an.",

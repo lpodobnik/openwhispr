@@ -3149,6 +3149,8 @@
       "selfHostedUrlMissing": "La registrazione delle note usa un server self-hosted, ma non è impostato alcun URL. Apri le Impostazioni e inserisci l'URL del tuo server.",
       "selfHostedUrlInvalid": "L'URL del server di trascrizione self-hosted non è valido. Usa https://, oppure http:// solo per un indirizzo di rete locale.",
       "selfHostedUnreachable": "Il server di trascrizione self-hosted non risponde. La riunione è ancora in registrazione.",
+      "languageSwitch": "Lingua parlata",
+      "languageSwitchFailed": "Impossibile cambiare la lingua della riunione. La trascrizione continua nella precedente.",
       "unsupportedProvider": "La registrazione delle note non può usare {{provider}} per la trascrizione dal vivo. Apri le Impostazioni e scegli Locale o un provider in streaming.",
       "noProviderSelected": "Nessun provider selezionato per la registrazione delle note. Apri le Impostazioni e scegli Locale o un provider in streaming.",
       "signInRequired": "La registrazione delle note richiede l'accesso. Accedi, per favore.",

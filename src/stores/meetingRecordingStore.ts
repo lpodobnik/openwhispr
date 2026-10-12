@@ -93,6 +93,8 @@ interface MeetingRecordingState {
    * elapsed seconds from this, so switching notes — which remounts the editor —
    * keeps the real duration. Meaningful only while `isRecording`. */
   recordingStartedAt: number | null;
+  /** Language picked during this recording ("auto" = detect); null follows Settings. */
+  sessionLanguage: string | null;
   segments: TranscriptSegment[];
   transcript: string;
   micPartial: string;
@@ -156,7 +158,8 @@ const isSegmentWithinIdentificationWindow = (
 const getMeetingTranscriptionOptions = () => {
   const state = getSettings();
   const resolved = selectResolvedMeetingTranscription(state);
-  const language = getBaseLanguageCode(state.preferredLanguage);
+  const sessionLanguage = useMeetingRecordingStore.getState().sessionLanguage;
+  const language = getBaseLanguageCode(sessionLanguage ?? state.preferredLanguage);
 
   return resolveMeetingTranscriptionOptions({
     transcriptionMode: resolved.transcriptionMode,
@@ -443,6 +446,7 @@ export const useMeetingRecordingStore = create<MeetingRecordingState>()(() => ({
   recordingNoteTitle: null,
   recordingFolderId: null,
   recordingStartedAt: null,
+  sessionLanguage: null,
   segments: [],
   transcript: "",
   micPartial: "",
@@ -1611,6 +1615,28 @@ export interface StopRecordingResult {
   stopped: boolean;
 }
 
+/**
+ * Switches the spoken language of the recording in progress ("auto" = detect).
+ * Settings stay as they are; the next recording starts from them again.
+ * Resolves false, with the previous language restored, if main couldn't switch.
+ */
+export async function setMeetingSessionLanguage(language: string): Promise<boolean> {
+  const previous = useMeetingRecordingStore.getState().sessionLanguage;
+  useMeetingRecordingStore.setState({ sessionLanguage: language });
+  if (!isRecordingFlag) return true;
+
+  const result = await window.electronAPI
+    ?.meetingTranscriptionSetLanguage?.(getBaseLanguageCode(language))
+    .catch(() => null);
+  if (result?.success) return true;
+
+  logger.warn("Meeting language switch failed", { error: result?.error }, "meeting");
+  if (useMeetingRecordingStore.getState().sessionLanguage === language) {
+    useMeetingRecordingStore.setState({ sessionLanguage: previous });
+  }
+  return false;
+}
+
 export async function stopRecording(expectedSessionId?: string): Promise<StopRecordingResult> {
   const canceledStart = meetingRecordingStartCoordinator.cancelActiveStart(expectedSessionId);
   if (canceledStart) {
@@ -1627,6 +1653,7 @@ export async function stopRecording(expectedSessionId?: string): Promise<StopRec
       systemAudioInterrupted: null,
       currentMicLevel: 0,
       recordingStartedAt: null,
+      sessionLanguage: null,
     });
     return { diarizationSessionId: null, stopped: false };
   }
@@ -1715,6 +1742,7 @@ export async function stopRecording(expectedSessionId?: string): Promise<StopRec
       systemAudioInterrupted: null,
       currentMicLevel: 0,
       recordingStartedAt: null,
+      sessionLanguage: null,
     });
 
     logger.info("Meeting transcription stopped", {}, "meeting");

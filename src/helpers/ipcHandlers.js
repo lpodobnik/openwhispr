@@ -9593,6 +9593,51 @@ class IPCHandlers {
       meetingTranscriptionLifecycle.stopSession(expectedSessionId)
     );
 
+    // Switches the spoken language of the recording in progress. Local and
+    // self-hosted modes pick it up on the next chunk; streaming providers fix the
+    // language at connect time, so their streams are reconnected in the new one.
+    // Audio keeps flowing to the old streams until the new ones are up, and a
+    // failed reconnect keeps the old streams (and language).
+    ipcMain.handle("meeting-transcription-set-language", async (_event, language) => {
+      const next = typeof language === "string" && language.trim() ? language.trim() : undefined;
+
+      if (meetingLocalMode) {
+        meetingLocalLanguage = next ?? null;
+        debugLogger.info("Meeting language switched", { language: next ?? "auto", mode: "local" });
+        return { success: true };
+      }
+
+      if (!meetingConnectionOptions || !this._meetingMicStreaming?.isConnected) {
+        return { success: false, error: "No meeting transcription is running." };
+      }
+
+      // A reconnect already in flight captured the old options; let it settle,
+      // or it would see them change underneath it and shut both streams down.
+      if (meetingReconnectPromise) await meetingReconnectPromise.catch(() => false);
+
+      const previous = meetingConnectionOptions;
+      if (!previous) return { success: false, error: "No meeting transcription is running." };
+      const previousMic = this._meetingMicStreaming;
+      const updated = { ...previous, language: next };
+      meetingConnectionOptions = updated;
+      // reconnectMeetingStreams also reports true when it fell back to the old
+      // streams, so success means the streams were actually replaced.
+      const recovered = await reconnectMeetingStreams({ restoreOldOnFailure: true });
+      const switched =
+        recovered && !!this._meetingMicStreaming && this._meetingMicStreaming !== previousMic;
+      if (!switched && meetingConnectionOptions === updated) {
+        meetingConnectionOptions = previous;
+      }
+      debugLogger.info("Meeting language switched", {
+        language: next ?? "auto",
+        mode: "streaming",
+        success: switched,
+      });
+      return switched
+        ? { success: true }
+        : { success: false, error: "Could not reconnect in the new language." };
+    });
+
     ipcMain.handle(
       "meeting-transcription-set-system-audio-available",
       async (event, sessionId, available) => {

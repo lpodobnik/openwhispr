@@ -3201,6 +3201,8 @@
       "selfHostedUrlMissing": "La grabación de notas usa un servidor propio, pero no hay URL configurada. Abre Ajustes e introduce la URL de tu servidor.",
       "selfHostedUrlInvalid": "La URL del servidor de transcripción propio no es válida. Usa https://, o http:// solo para una dirección de red local.",
       "selfHostedUnreachable": "El servidor de transcripción propio no responde. La reunión se sigue grabando.",
+      "languageSwitch": "Idioma hablado",
+      "languageSwitchFailed": "No se pudo cambiar el idioma de la reunión. Se sigue transcribiendo en el anterior.",
       "unsupportedProvider": "La grabación de notas no puede usar {{provider}} para transcripción en vivo. Abre Ajustes y elige Local o un proveedor de streaming.",
       "noProviderSelected": "No hay ningún proveedor seleccionado para la grabación de notas. Abre Ajustes y elige Local o un proveedor de streaming.",
       "signInRequired": "La grabación de notas requiere iniciar sesión. Por favor, inicia sesión.",

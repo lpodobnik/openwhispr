@@ -3500,6 +3500,8 @@
       "selfHostedUrlMissing": "Self-hosted is selected for Note Recording but no server URL is set. Open Settings and enter your server URL.",
       "selfHostedUrlInvalid": "The self-hosted transcription server URL is invalid. Use https://, or http:// only for a local network address.",
       "selfHostedUnreachable": "The self-hosted transcription server isn't responding. The meeting is still recording.",
+      "languageSwitch": "Spoken language",
+      "languageSwitchFailed": "Couldn't switch the meeting language. Still transcribing in the previous one.",
       "unsupportedProvider": "Note Recording can't use {{provider}} for live transcription. Open Settings and choose Local or a streaming provider.",
       "noProviderSelected": "No provider is selected for Note Recording. Open Settings and choose Local or a streaming provider.",
       "signInRequired": "Note Recording requires you to be signed in. Please sign in.",

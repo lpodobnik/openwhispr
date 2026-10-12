@@ -3500,6 +3500,8 @@
       "selfHostedUrlMissing": "L'enregistrement de notes utilise un serveur auto-hébergé, mais aucune URL n'est définie. Ouvrez les Réglages et saisissez l'URL de votre serveur.",
       "selfHostedUrlInvalid": "L'URL du serveur de transcription auto-hébergé n'est pas valide. Utilisez https://, ou http:// uniquement pour une adresse de réseau local.",
       "selfHostedUnreachable": "Le serveur de transcription auto-hébergé ne répond pas. La réunion est toujours enregistrée.",
+      "languageSwitch": "Langue parlée",
+      "languageSwitchFailed": "Impossible de changer la langue de la réunion. La transcription continue dans la précédente.",
       "unsupportedProvider": "L'enregistrement de notes ne peut pas utiliser {{provider}} pour la transcription en direct. Ouvrez les Réglages et choisissez Local ou un fournisseur en streaming.",
       "noProviderSelected": "Aucun fournisseur n'est sélectionné pour l'enregistrement de notes. Ouvrez les Réglages et choisissez Local ou un fournisseur en streaming.",
       "signInRequired": "L'enregistrement de notes nécessite d'être connecté. Veuillez vous connecter.",

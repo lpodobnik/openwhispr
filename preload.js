@@ -925,6 +925,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.send("meeting-transcription-send", buffer, source),
   meetingTranscriptionSetSystemAudioAvailable: (sessionId, available) =>
     ipcRenderer.invoke("meeting-transcription-set-system-audio-available", sessionId, available),
+  meetingTranscriptionSetLanguage: (language) =>
+    ipcRenderer.invoke("meeting-transcription-set-language", language),
   meetingTranscriptionStop: (expectedSessionId) =>
     ipcRenderer.invoke("meeting-transcription-stop", expectedSessionId),
   meetingTranscriptionCancel: () => ipcRenderer.invoke("meeting-transcription-cancel"),
