@@ -107,6 +107,16 @@ const HyprlandShortcutManager = require("./hyprlandShortcut");
 const AssemblyAiStreaming = require("./assemblyAiStreaming");
 const { i18nMain, changeLanguage } = require("./i18nMain");
 const { transcribeSelfHostedChunk, createFailureTracker } = require("./selfHostedMeetingChunk");
+const { verifyLanHosts } = require("./lanHosts");
+
+// Main routes through its own copy of src/utils/urlUtils.ts, so it keeps its
+// verified-LAN list in step before resolving a route (see lanHosts.js).
+async function syncLanHosts(urls) {
+  const hostnames = await verifyLanHosts(urls);
+  const { setVerifiedLanHosts } = await import("../utils/urlUtils.ts");
+  setVerifiedLanHosts(hostnames);
+  return hostnames;
+}
 const DeepgramStreaming = require("./deepgramStreaming");
 const { GeminiLiveStreaming, GEMINI_LIVE_MODEL } = require("./geminiLiveStreaming");
 const CortiStreaming = require("./cortiStreaming");
@@ -1589,6 +1599,11 @@ class IPCHandlers {
         level,
       });
       return true;
+    });
+
+    ipcMain.handle("verify-lan-hosts", async (_event, urls) => {
+      const list = Array.isArray(urls) ? urls.filter((url) => typeof url === "string") : [];
+      return syncLanHosts(list.slice(0, 64));
     });
 
     ipcMain.handle("test-provider-connection", async (_event, config) => {
@@ -6729,6 +6744,7 @@ class IPCHandlers {
         const { convertBufferToWav, isWavFormat } = require("./ffmpegUtils");
         // Renderer pre-flight owns policy; retry re-routes stored audio through
         // whatever is selected NOW.
+        await syncLanHosts([settings?.remoteTranscriptionUrl, settings?.cloudTranscriptionBaseUrl]);
         const route = resolveTranscriptionRoute({
           settings: settings || {},
           providers: transcriptionProviderBaseUrls(),
@@ -9101,6 +9117,7 @@ class IPCHandlers {
           // to a secure endpoint must not start, and must never fall through to a
           // cloud provider. Same resolver and rules as dictation's self-hosted mode.
           if (meetingLocalProvider === "self-hosted") {
+            await syncLanHosts([options.remoteUrl]);
             const { resolveTranscriptionRoute } = await import("./transcriptionRoute.ts");
             const route = resolveTranscriptionRoute({
               settings: {
@@ -10482,6 +10499,7 @@ class IPCHandlers {
           const sourcePath = resolveAllowedAudioPath(filePath);
           if (!sourcePath) return { success: false, error: "File path not allowed" };
 
+          await syncLanHosts([remoteTranscriptionUrl, baseUrl]);
           const { resolveTranscriptionRoute } = await import("./transcriptionRoute.ts");
           const route = resolveTranscriptionRoute({
             settings: {

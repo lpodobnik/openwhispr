@@ -10,6 +10,7 @@ import { I18nDirectionProvider } from "./components/I18nDirectionProvider.tsx";
 import { ToastProvider } from "./components/ui/Toast.tsx";
 import { SettingsProvider } from "./hooks/useSettings";
 import { bindDocumentLanguage } from "./utils/i18nDocument";
+import { startLanHostSync } from "./utils/lanHostSync";
 
 import i18n from "./i18n";
 // Self-hosted so it works offline and makes no network call — the "opsz" build
@@ -22,6 +23,7 @@ import "./brandFonts";
 import "./index.css";
 
 bindDocumentLanguage(i18n, document.documentElement, import.meta.hot);
+startLanHostSync();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

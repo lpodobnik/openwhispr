@@ -1255,6 +1255,8 @@ declare global {
       stopOnboardingDemo?: (id: string) => Promise<boolean>;
       publishOnboardingDemoEvent?: (event: Omit<OnboardingDemoEvent, "demoId">) => Promise<boolean>;
       onOnboardingDemoEvent?: (callback: (event: OnboardingDemoEvent) => void) => () => void;
+      /** Hostnames among `urls` that resolve only to private addresses (plain HTTP allowed). */
+      verifyLanHosts?: (urls: string[]) => Promise<string[]>;
       testProviderConnection?: (config: {
         scope: "transcription" | "reasoning";
         provider: string;

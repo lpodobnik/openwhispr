@@ -17,10 +17,21 @@ function parseIPv4Literal(hostname: string): number[] | null {
   return octets;
 }
 
+// DNS names the main process resolved to private addresses only, e.g. a LAN
+// server at gpu.lan.example.com → 10.0.0.82 (verifyLanHosts in
+// src/helpers/lanHosts.js). Each process keeps its own copy: renderers sync it
+// from the URL settings (lanHostSync.ts), main sets it before routing.
+let verifiedLanHosts: ReadonlySet<string> = new Set();
+
+export function setVerifiedLanHosts(hostnames: readonly string[]): void {
+  verifiedLanHosts = new Set(hostnames.map((hostname) => hostname.toLowerCase()));
+}
+
 function isPrivateHost(hostname: string): boolean {
   const h = hostname.toLowerCase().replace(/^\[|\]$/g, "");
 
   if (h === "localhost" || h === "0.0.0.0") return true;
+  if (verifiedLanHosts.has(h)) return true;
   if (h === "::1") return true;
 
   const ipv4 = parseIPv4Literal(h);

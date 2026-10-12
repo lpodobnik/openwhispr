@@ -110,3 +110,19 @@ test("secure HTTP endpoints reject non-HTTP schemes even on private hosts", asyn
   assert.equal(isSecureHttpEndpoint("ftp://192.168.1.20/v1"), false);
   assert.equal(isSecureHttpEndpoint("ws://127.0.0.1:5001/v1"), false);
 });
+
+test("plain http is allowed to a DNS name only while main has verified it as LAN", async () => {
+  const { isSecureHttpEndpoint, setVerifiedLanHosts } = await load();
+  const url = "http://sandcrawler.lan.croz.net:8000/v1/audio/transcriptions";
+
+  try {
+    assert.equal(isSecureHttpEndpoint(url), false);
+    setVerifiedLanHosts(["Sandcrawler.lan.croz.net"]);
+    assert.equal(isSecureHttpEndpoint(url), true);
+    assert.equal(isSecureHttpEndpoint("http://other.lan.croz.net:8000"), false);
+    setVerifiedLanHosts([]);
+    assert.equal(isSecureHttpEndpoint(url), false);
+  } finally {
+    setVerifiedLanHosts([]);
+  }
+});

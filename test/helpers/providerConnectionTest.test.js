@@ -279,3 +279,12 @@ test("reports endpointNotFound only after every candidate 404s", async () => {
     }
   );
 });
+
+test("custom http endpoints on a DNS name pass only once verified as LAN", () => {
+  const config = { provider: "custom", baseUrl: "http://gpu.lan.example.com:8000/v1" };
+
+  assert.throws(() => resolveProviderRequest(config), /HTTPS/);
+  assert.ok(
+    resolveProviderRequest(config, { lanHosts: ["gpu.lan.example.com"] }).endpoints.length > 0
+  );
+});

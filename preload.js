@@ -91,6 +91,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     (callback) => (_event, payload) => callback(payload)
   ),
   testProviderConnection: (config) => ipcRenderer.invoke("test-provider-connection", config),
+  verifyLanHosts: (urls) => ipcRenderer.invoke("verify-lan-hosts", urls),
   pasteText: (text, options) => ipcRenderer.invoke("paste-text", text, options),
   captureSelectedText: (options) => ipcRenderer.invoke("capture-selected-text", options),
   replaceSelectedText: (sessionId, text, options) =>
